@@ -1,0 +1,100 @@
+spinsys {
+    channels 1H
+    nuclei 1H 1H
+    dipole 1 2 -10080 10 20 30
+}
+
+
+
+par {
+	proton_frequency 400e6
+	spin_rate        8000
+	crystal_file     rep100
+    gamma_angles     40
+    np               16
+    start_operator   I1z
+    detect_operator  -I2z
+    verbose          1111
+	conjugate_fid 	 false
+}
+
+
+
+proc pulseq {} {
+    global par
+
+    maxdt 3.0
+		source recoupling.tcl
+
+		matrix set 1 totalcoherence {2 -2}
+
+    rec $par(type)
+		store 1
+
+# DQF
+	  filter 1
+	  reset
+# Reconversion
+    prop 1
+    store 2
+    reset
+
+# take first data point
+# point zero
+acq
+
+# loop below reuses stored propagators for the rest of acq
+	for {set j 1} {$j < $par(np)} {incr j} {
+	reset
+	for {set k 1} {$k <= $j} {incr k} {
+	prop 1
+	}
+	filter 1
+	for {set k 1} {$k <= $j} {incr k} {
+	prop 2
+	}
+  acq
+	}
+
+}
+
+proc main {} {
+    global par
+
+		puts "Which recoupling do you desire: "
+		gets stdin seq
+    if {$seq == "rseq"} {
+			puts "N: "
+			gets stdin NN
+			puts "nsub: "
+			gets stdin nnsub
+			puts "nusup"
+			gets stdin nnusup
+		}
+		set par(type) $seq
+		set run_sim 1
+		switch $par(type) {
+			s3 { set par(sw) [expr $par(spin_rate)/16] }
+			brs3 { set par(sw) [expr $par(spin_rate)/16] }
+			sr26 { set par(sw) [expr $par(spin_rate)/33.28] }
+			postc7 { set par(sw) [expr $par(spin_rate)/14] }
+			rseq { set par(sw) [expr $par(spin_rate)/$nnsub]
+						 set par(N) [expr $NN]
+						 set par(nsub) [expr $nnsub]
+						 set par(nusup) [expr $nnusup]
+					 }
+			baba { set par(sw) [expr $par(spin_rate)/8] }
+			swfbaba { set par(sw) [expr $par(spin_rate)/8] }
+			default {puts "My genius, develop this sequence yourself!"
+							 set run_sim 0}
+		}
+ if {$run_sim == 1} {
+		set dwl [expr 1e3/$par(sw)]
+		puts "dwell time: $dwl ms"
+		puts "number of points acquired: $par(np)"
+		set f [fsimpson]
+		fsave $f $par(name)-$par(type).txt -xreim
+	} else {
+	puts "no simulation for today, run experiments"
+}
+}
