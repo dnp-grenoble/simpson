@@ -1,0 +1,78 @@
+spinsys {
+  channels 13C 14N
+  nuclei 13C 14N
+  dipole 1 2 -1000 0 30 40
+  quadrupole 2 2 5e6 0 0 0 0
+}
+
+par {
+  proton_frequency 600e6
+  spin_rate       10000
+  crystal_file    rep144
+  gamma_angles    40
+  start_operator  I1z
+  detect_operator -I1z
+  # RF power for R3 recoupling condition on spin 1/2
+  variable rfwr   spin_rate
+  # Rf power for recoupling on the spin 1/2 
+  variable rf180  100000
+   #This should be the sample rate for the build up, given in us  
+  variable tauint 200
+  # This is the final buildup time in us
+  variable taufinal 10000
+  #This is the length of the saturation pulse on the quad in us 
+  variable tausat 200
+  verbose         1101
+  conjugate_fid   false
+}
+
+proc pulseq {} {
+  global par
+
+  maxdt 1.0
+
+  set taur [expr 1e6/$par(spin_rate)]
+  set tau180 [expr 0.5e6/$par(rf180)]
+  set tausathalf [expr $par(tausat)/2-$tau180/2]  
+  set delay1 [expr $taur-$par(tausat)/2]
+  #matrix set 1 totalcoherence {2 -2}
+  
+  # This is the excitation block and the reconversion
+  reset
+  pulse $par(tauint) $par(rfwr) x 0 x
+  store 1
+  
+   # This is the refocusing block
+  reset
+  delay $delay1
+  pulse $tausathalf 0 x $par(rfsat) x
+  pulse $tau180 $par(rf180) x $par(rfsat) x
+  pulse $tausathalf 0 x $par(rfsat) x
+  delay $delay1
+  store 2
+
+ 
+  for {set i 1} {$i <= $par(np)} {incr i} {
+  reset
+  # the whole seq as (excitaion)xn - refocusing - (reconversion)xn
+  prop 1 $i
+  prop 2
+  prop 1 $i
+  acq
+  }
+}
+
+proc main {} {
+  global par
+  foreach p {{m 40000} {n 0}} {
+  set par(type) [lindex $p 0]
+  set par(rfsat) [lindex $p 1]
+  set par(sw) [expr 1e6/$par(tauint)]
+  set par(np) [expr $par(taufinal)/$par(tauint)]
+  set $par(type) [fsimpson]
+  }
+ # m is S and n is s0 
+  fsub $n $m
+# fsub does S-S0 and puts it into n
+  fsave $n $par(name)-deltaS.txt -xreim
+}
