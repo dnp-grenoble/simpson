@@ -1,0 +1,92 @@
+spinsys {
+  channels 13C 14N
+  nuclei 13C 14N
+  dipole 1 2 -1000 0 0 0
+  quadrupole 2 2 5e6 0 0 0 0
+}
+
+par {
+  proton_frequency 600e6
+  spin_rate       10000
+  crystal_file    rep320
+  gamma_angles    18
+  start_operator  I1x
+  detect_operator I1p
+  # RF power for R3 recoupling condition on spin 1/2
+  variable rfwr   spin_rate
+  # Rf power for recoupling on the spin 1/2 
+  variable rf180  80000
+  # This is the final buildup time in us
+  variable taufinal 10000
+  #This is the length of the saturation pulse on the quad in us 
+  variable tausat  100
+  verbose         1101
+  conjugate_fid   false
+}
+
+proc pulseq {} {
+  global par
+
+  maxdt 1.0
+  set N 4
+  set smalln 1
+  set nu 2
+  set phase [expr 180*$nu/$N]
+  set rfR [expr $N*$par(spin_rate)/2]
+  set tauRseq [expr 0.5e6/$rfR]
+  set taur [expr 1e6/$par(spin_rate)]
+  set tau180 [expr 0.5e6/$par(rf180)]
+  set tausathalf [expr $par(tausat)/2-$tau180/2]  
+  set delay1 [expr $taur-$par(tausat)/2]
+  #matrix set 1 totalcoherence {2 -2}
+  
+  
+  reset
+  for {set j 0} {$j <= 240} {incr j 120} {
+        pulse $tauRseq $rfR [expr $phase+$j] 0 x
+        pulse $tauRseq $rfR [expr 360-$phase+$j] 0 x
+        pulse $tauRseq $rfR [expr $phase+$j] 0 x
+        pulse $tauRseq $rfR [expr 360-$phase+$j] 0 x    
+        pulse $tauRseq $rfR [expr 360-$phase+$j] 0 x
+        pulse $tauRseq $rfR [expr $phase+$j] 0 x
+        pulse $tauRseq $rfR [expr 360-$phase+$j] 0 x
+        pulse $tauRseq $rfR [expr $phase+$j] 0 x
+    }
+  store 1
+  
+  reset
+  delay $delay1
+  pulse $tausathalf 0 x $par(rfsat) x
+  pulse $tau180 $par(rf180) x $par(rfsat) x
+  pulse $tausathalf 0 x $par(rfsat) x
+  delay $delay1
+  store 2
+
+  reset
+  acq
+  for {set i 1} {$i < $par(np)} {incr i} {
+  reset
+  prop 1 $i
+  prop 2
+  prop 1 $i
+  acq
+  }
+}
+
+proc main {} {
+  global par
+  set par(tauint) [expr 3e6/$par(spin_rate)]
+  set par(sw) [expr 1e6/$par(tauint)]
+  set par(np) 10
+  foreach p {{m 40000} {n 0}} {
+  set par(type) [lindex $p 0]
+  set par(rfsat) [lindex $p 1]
+  set $par(type) [fsimpson]
+  }
+  #set d fdup $n
+  #fsub $n $m
+  fsave $m $par(name)-S.txt -xreim
+  fsave $n $par(name)-S0.txt -xreim
+  fsub $n $m
+  fsave $n $par(name)-deltaS.txt -xreim
+}
