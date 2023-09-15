@@ -1,0 +1,86 @@
+spinsys {
+  channels 13C 31P
+  nuclei 13C 31P
+  dipole  1 2 -758.07 110.25 0.9 -110.44
+}
+
+par {
+  spin_rate       8000
+  np              24
+  crystal_file    rep168
+  gamma_angles    48
+  start_operator  I1x
+  detect_operator I1p
+  verbose         1101
+  sw              spin_rate/4
+}
+
+proc pulseq {} {
+  global par
+
+  maxdt 1.0
+
+  set rfC  150000
+  set rfP  150000
+  set tr    [expr 1.0e6/$par(spin_rate)]
+  set t90C  [expr 0.25e6/$rfC]
+  set t180C [expr 2.0*$t90C]
+  set t90P  [expr 0.25e6/$rfP]
+  set t180P [expr 2.0*$t90P]
+
+ 
+  reset
+  delay [expr $tr/2.0-$t180P]
+  pulse $t180P 0 x $rfP x    
+  delay [expr $tr/2.0-$t180P]
+  pulse $t180P 0 x $rfP y
+  store 1
+
+  reset
+  delay [expr 1*$tr-$t180C/2]
+  pulse $t180C $rfC x 0 x
+  delay [expr 1*$tr-$t180C/2]
+  store 2
+  reset
+  
+  reset
+  pulse $t180P 0 x $rfP x  
+  delay [expr $tr/2.0-$t180P]
+  pulse $t180P 0 x $rfP y  
+  delay [expr $tr/2.0-$t180P]
+  store 3
+
+
+  for {set s 0} {$s < $par(np)} {incr s} {
+  reset
+
+  prop 1 $s
+  prop 2
+  prop 3 $s
+
+ 
+  pulseid 1 250000 x 250000 x
+  pulseid 1 250000 x 250000 $par(ph)
+
+ 
+  prop 1 $s
+  prop 2
+  prop 3 $s
+ 
+  acq $par(ph)
+  }
+}
+
+proc main {} {
+  global par
+  foreach par(ph) {x -x} {
+    set g [fsimpson]
+    if [info exists f] {
+      fadd $f $g
+      funload $g
+      } else {
+      set f $g
+      }
+  }
+  fsave $f $par(name).txt -xreim
+}
