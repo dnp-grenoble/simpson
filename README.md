@@ -2,12 +2,12 @@
 ## Numerical simulations in NMR using SIMPSON
 
 The link to the github repo is:
-https://github.com/dnp-grenoble/simpson
+[SIMPSON](https://github.com/dnp-grenoble/simpson)
 
 The simulation files are mainly guides. Modify them as you feel like and if there are some errors, please let me know. I am not responsible if there do not work as intended. Please follow courses in the SIMPSON website.
 
 
-INANO website: https://inano.au.dk/about/research-centers-and-projects/nmr/software/simpson
+[INANO website](https://inano.au.dk/about/research-centers-and-projects/nmr/software/simpson)
 
 More simulation files will be added in due course.
 
