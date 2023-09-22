@@ -40,7 +40,7 @@ Jaroniec, C. P.; Filip, C.; Griffin, R. G. 3D TEDOR NMR Experiments for the Simu
 
 
 ### Heteronuclear Decoupling   
-The hetdec.in file contains the option to simulate various heteronuclear decoupling. For the spin sythem, I have chosen a $CH_2$ spin-system and the decoupling sequences that I have implemented are CW, rCW, TPPM, $SW_f$ - TPPM, SPINAL64, and XiX. The sequences can be improved by changing various parameters. I leave it up to the people interested in the topic. I have already done a PhD on it! So not going into optimisation of sequences.
+The hetdec.in file contains the option to simulate various heteronuclear decoupling sequences in solid-state NMR. For the spin system, I have chosen a $CH_2$ spin-system and the decoupling sequences that I have implemented are CW, rCW, TPPM, $SW_f$ - TPPM, SPINAL64, and XiX. The sequences can be improved by changing various parameters. I leave it up to the people interested in the topic. I have already done a PhD on it! So I am not going into optimisation of sequences.
 
 If you want to just run one sequence, you can modify the code in the following manner:
 ```
