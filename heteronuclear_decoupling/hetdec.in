@@ -1,0 +1,115 @@
+spinsys {
+  channels 13C 1H
+  nuclei 13C 1H 1H
+  shift 2 3.5p 1p 0 10 20 0
+  shift 3 8.3p 2p 0 20 30 0
+  dipole 1 2 -21974.45 63.17 30.06 73.88
+  dipole 1 3 -21339.63 95.06 56.44 97.02
+  dipole 2 3 -22114.23 121.96 31.81 129.34
+}
+
+par {
+  spin_rate        8000
+  method           direct freq block_diag
+  sw               spin_rate
+  variable tsw     1e6/sw
+  variable tr      1e6/spin_rate
+  proton_frequency 400e6
+  np               2048
+  crystal_file     rep100
+  gamma_angles     8
+  start_operator   I1x
+  detect_operator  I1p
+  variable rf      100000
+  variable flip    165
+  variable tdec    1e6*flip/360/rf
+  variable t180    1e6*180/360/rf
+  variable ph      12.5
+  variable xix     2.8
+  verbose          01
+  num_cores        4
+}
+
+proc decoupling {type} {
+    global par
+    maxdt 2
+    switch $type {
+   
+   cw {
+    acq_block {
+      pulse $par(tdec) 0 x $par(rf) 0
+      pulse $par(tdec) 0 x $par(rf) 0
+    }
+   }
+   
+   tppm {
+    acq_block {
+      pulse $par(tdec) 0 x $par(rf) $par(ph)
+      pulse $par(tdec) 0 x $par(rf) -$par(ph)
+    }
+   }
+   
+   swftppm {
+    acq_block {
+        foreach mul [list 0.78 0.86 0.94 0.96 0.98 1 1.02 1.04 1.06 1.14 1.22] {
+            pulse [expr $mul*$par(tdec)] 0 0 $par(rf) $par(ph)
+            pulse [expr $mul*$par(tdec)] 0 0 $par(rf) -$par(ph)
+        }
+    }
+    }
+
+   xix {
+    acq_block {
+    pulse [expr $par(tr)*$par(xix)] 0 x $par(rf) x
+    pulse [expr $par(tr)*$par(xix)] 0 x $par(rf) -x
+   }
+   }
+   
+   spinal64 {
+     acq_block {
+      foreach sup [list 1 -1 -1 1 -1 1 1 -1] {
+      pulse $par(tdec) 0 x $par(rf) [expr $sup*$par(ph)]
+      pulse $par(tdec) 0 x $par(rf) [expr -$sup*$par(ph)]
+      pulse $par(tdec) 0 x $par(rf) [expr $sup*($par(ph)+5)]
+      pulse $par(tdec) 0 x $par(rf) [expr $sup*(-$par(ph)-5)]
+      pulse $par(tdec) 0 x $par(rf) [expr $sup*($par(ph)+10)]
+      pulse $par(tdec) 0 x $par(rf) [expr $sup*(-$par(ph)-10)]
+      pulse $par(tdec) 0 x $par(rf) [expr $sup*($par(ph)+5)]
+      pulse $par(tdec) 0 x $par(rf) [expr $sup*(-$par(ph)-5)]
+      }
+    }
+   }
+
+   rcw {
+    acq_block {
+        pulse [expr $par(tr)-0.5*$par(t180)] 0 0 $par(rf) 0
+        pulse $par(t180) 0 0 $par(rf) 90
+        pulse [expr $par(tr)-$par(t180)] 0 0 $par(rf) 0
+        pulse $par(t180) 0 0 $par(rf) 0
+        pulse [expr $par(tr)-$par(t180)] 0 0 $par(rf) 0
+        pulse $par(t180) 0 0 $par(rf) 90
+        pulse [expr $par(tr)-0.5*$par(t180)] 0 0 $par(rf) 0
+    }
+   }
+   }
+}
+
+
+
+proc pulseq {} {
+   global par
+   decoupling $par(dec)
+}
+
+proc main {} {
+  global par
+  foreach dectype [list cw tppm swftppm spinal64 xix rcw] {
+  set par(dec) $dectype
+  set f [fsimpson]
+  fft $f -inv
+  faddlb $f 50 0
+  fzerofill $f 8192
+  fft $f
+  fsave $f $par(name)-$dectype.txt -xreim
+  }
+}
