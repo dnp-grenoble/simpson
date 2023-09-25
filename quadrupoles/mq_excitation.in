@@ -1,0 +1,38 @@
+spinsys {
+     nuclei 27Al
+     channels 27Al
+     quadrupole 1 2 10e6 0.5 10 20 30
+}
+
+par {
+  method          	gcompute
+  gamma_angles    	256
+  spin_rate       	10000
+  crystal_file    	rep320
+  start_operator  	I1z
+  np              	64
+  sw                spin_rate*gamma_angles
+  variable tp    	  1e6/sw
+  variable rf       150000
+  verbose         	1001
+}
+
+proc pulseq {} {
+  global par
+  matrix set detect coherence $par(detco)
+  reset 
+  acq_block { 
+       pulse $par(tp) $par(rf) -y
+  }
+}
+
+proc main {} {
+  global par
+  set coherence_order {3 5}
+  foreach i $coherence_order {
+  set par(detco) [expr $i]  
+  set f [fsimpson]
+  fsave $f $par(name)-$par(detco).txt -xreim
+  funload $f
+  }
+}
