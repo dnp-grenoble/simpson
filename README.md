@@ -51,4 +51,15 @@ foreach dectype [list tppm]
 In this example, it will just do tppm instead of all the sequences.
 
 ### Quadrupolar NMR
-The mq_excitation.in helps you to cimulate how much MQ efficiency you can get as a function of pulse length. One can change parameters like RF power, spinning frequency, $C_q$ and see how much the efficiency changes. 
+The mq_excitation.in helps you to cimulate how much MQ efficiency you can get as a function of pulse length. One can change parameters like RF power, spinning frequency, $C_q$ and see how much the efficiency changes.
+
+
+### Third Spin Assisted Recoupling
+The files par_grid.in and pain_grid.in simulates third spin assisted recoupling maps as reported in the papers:
+ - Lewandowski, J. R. et al. Journal of the American Chemical Society 2009, 131 (16), 5769–5776. https://doi.org/10.1021/ja806578y.
+- De Paëpe, G. et. al. Journal of Chemical Physics 2008, 129 (24), 245101. https://doi.org/10.1063/1.3036928.
+- Paul, S. et. al. Annual Reports on NMR Spectroscopy; 2015; Vol. 85, pp 93–142. https://doi.org/10.1016/bs.arnmr.2014.12.003.
+
+The files uses acq_block and block diagonalisation to speed up the simulation. The spin system is derived from the xyz coordinates of L-Alanine.
+
+

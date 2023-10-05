@@ -1,0 +1,52 @@
+spinsys {
+ channels 13C 1H
+    nuclei 13C 13C 1H
+    shift 1 -1006  2012 0.430 90 90 180
+    shift 2  1006  2012 0.500 87 64 338
+    shift 3  1000 -3080 0.650 90 90  90
+    dipole 1 2 -2139.35 -115.31 50.24 125.94
+    dipole 1 3 -21521.22 113.36 31.72 -124.77 
+    dipole 2 3 -2955.82 -101.56 72.58 92.23
+}
+
+par {
+proton_frequency 400e6
+spin_rate        20000
+start_operator   I1x
+detect_operator  I2x
+gamma_angles     16
+verbose          00000000
+np               1000
+sw               spin_rate*gamma_angles
+variable tsw     1e6/sw
+variable par_mix np*tsw
+crystal_file     rep66
+method           block_diag dsyev gcompute
+}
+
+
+proc pulseq {} {
+
+    global par
+    acq_block { pulse $par(tsw) $par(rfC) x $par(rfH) x }
+}
+
+proc main {} {
+global par
+set t0 [clock clicks -millisec]
+set fp [open $par(name).txt w+]
+puts $fp "pc ph real"
+puts "PAR mixing time = [format "%.2f" $par(par_mix)]"
+for {set pc 0} {$pc <= 5} {set pc [expr {$pc + 0.1}]} {
+	set par(rfC) [expr {$par(spin_rate)*$pc}]
+  puts "pc = [format "%.2f" $pc]"
+	for {set ph 0} {$ph <= 5} {set ph [expr {$ph + 0.1}]} {
+	    set par(rfH) [expr {$par(spin_rate)*$ph}]
+	    set g [fsimpson]
+	    set re [findex $g $par(np) -re]
+	    puts $fp "[format "%.2f" $pc] [format "%.2f" $ph] [format "%.2f" $re]"
+    }
+}
+close $fp
+puts stderr "[expr {([clock clicks -millisec]-$t0)/1000.}] sec"
+}
