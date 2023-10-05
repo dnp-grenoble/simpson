@@ -51,7 +51,7 @@ foreach dectype [list tppm]
 In this example, it will just do tppm instead of all the sequences.
 
 ### Quadrupolar NMR
-The mq_excitation.in helps you to cimulate how much MQ efficiency you can get as a function of pulse length. One can change parameters like RF power, spinning frequency, $C_q$ and see how much the efficiency changes.
+The mq_excitation.in helps you to simulate how much MQ efficiency you can get as a function of pulse length. One can change parameters like RF power, spinning frequency, $C_q$ and see how much the efficiency changes.
 
 
 ### Third Spin Assisted Recoupling
