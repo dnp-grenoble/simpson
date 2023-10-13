@@ -62,6 +62,9 @@ The files par_grid.in and pain_grid.in simulates third spin assisted recoupling 
 
 The files uses acq_block and block diagonalisation to speed up the simulation. The spin system is derived from the xyz coordinates of L-Alanine.
 
+The file pspar_grid.in simulates a modified version of PAR to make it broadbanded. The simulations are done for a field strength of 900 MHz (1H Larmor freq) and 60 kHz MAS frequency. The relevant literature is:
+- Giffard, Mathilde, *et. al.* Physical Chemistry Chemical Physics : PCCP 14, no. 20 (May 2012): 7246–55. https://doi.org/10.1039/c2cp40406k.
+
 
 ### Cross Polarisation
 
