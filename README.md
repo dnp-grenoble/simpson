@@ -63,3 +63,7 @@ The files par_grid.in and pain_grid.in simulates third spin assisted recoupling 
 The files uses acq_block and block diagonalisation to speed up the simulation. The spin system is derived from the xyz coordinates of L-Alanine.
 
 
+### Cross Polarisation
+
+The file cpmas.in simulates the polarisation buildup for a CH2-CO kind of system.
+The RF pulses employed here are square pulses.
