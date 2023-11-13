@@ -26,6 +26,8 @@ The recoupling sequence that have been implemented are:
 
 The files S3_CC.in and SR26_CC.in simulates the buildup of polarisation using reusable propagators to speed up the calculations. The spin system and parameters are that of formic acid to reproduce some of the simulations reported in the literature.
 
+The file brS3_CC.in simulates the DQ buildup in the same spin system but with bracketed S3 as reported in the paper G. Teymoori et al. Journal of Magnetic Resonance 261 (2015) 205–220. The scaling and faster build up of bracketed version is evident from the figure S3vsbrS3_scaling.png.
+
 ### RESPDOR
 
 There are two variants of RESPDOR in the repository.
