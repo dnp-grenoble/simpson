@@ -24,6 +24,8 @@ The recoupling sequence that have been implemented are:
 6. BABA
 7. $SW_f$-BABA
 
+The files S3_CC.in and SR26_CC.in simulates the buildup of polarisation using reusable propagators to speed up the calculations. The spin system and parameters are that of formic acid to reproduce some of the simulations reported in the literature.
+
 ### RESPDOR
 
 There are two variants of RESPDOR in the repository.

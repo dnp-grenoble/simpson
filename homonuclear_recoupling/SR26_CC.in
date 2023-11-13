@@ -1,0 +1,85 @@
+## The simulation file is checked against the simulations
+## done in Fig 3c of paper Teymoori, G. et al.
+## Low-Power Broadband Homonuclear Dipolar Recoupling in MAS NMR
+## by Two-Fold Symmetry Pulse Schemes for Magnetization Transfers 
+## and Double-Quantum Excitation. 
+## Journal of Magnetic Resonance 2015, 261, 205–220.
+## The coordinate and spinsys parameters are that of fumaric acid
+## as given in the paper.
+
+
+spinsys {
+    channels 13C
+    nuclei 13C 13C
+    dipole 1 2 -136 0 90 0
+	  shift 1 0p 65p 0.8 28.9 15.3 -42.6
+	  shift 2 0p 65p 0.8 28.9 15.3 -42.6
+}
+
+
+par {
+  proton_frequency 400e6
+  spin_rate        5538
+  crystal_file     rep144
+  gamma_angles     40
+  np               8
+  start_operator   I1z
+  detect_operator  -I2z
+  verbose          00000010
+  sw               spin_rate/32
+  conjugate_fid 	 false
+}
+
+proc pulseq {} {
+    global par
+
+    maxdt 3.0
+
+    set rf [expr 6.5*$par(spin_rate)]
+    set t90 [expr 0.25e6/$rf]
+    set t270 [expr 0.75e6/$rf]
+    set ph [expr 180*11/26]
+
+		matrix set 2 totalcoherence {2 -2}
+
+    set rf [expr 6.5*$par(spin_rate)]
+
+        for {set k 1} {$k <=2} {incr k} {
+            for {set j 1} {$j <=2} {incr j} {
+                for {set i 1} {$i <= 13} {incr i} {
+                    pulse $t90  $rf [expr pow(-1,$k-1)*pow(-1,$j-1)*$ph+fmod($k+1,2)*180]
+                    pulse $t270 $rf [expr pow(-1,$k-1)*pow(-1,$j-1)*$ph+fmod($k,2)*180]
+                    pulse $t90  $rf [expr -pow(-1,$k-1)*pow(-1,$j-1)*$ph+fmod($k+1,2)*180]
+                    pulse $t270 $rf [expr -pow(-1,$k-1)*pow(-1,$j-1)*$ph+fmod($k,2)*180]
+                }
+            }
+        }
+
+    store 1 ; #stores the propagator for 1 block of S3
+	  reset ; # resets the density matrix to rho0
+    store 3 ; # identity prop
+    acq ; # take first data point i.e. zero
+
+    # loop below reuses stored propagators for the rest of acq
+  for {set j 1} {$j < $par(np)} {incr j} {
+        reset
+        prop 3 ; # call the identity propagator for the first time and then calls 1 to j-1 S3's
+        prop 1 ; # call jth S3
+        store 3 ; # store it in 3 and reused later
+        #filter 2 ;  # filter it for DQ
+        prop 3 ; # reconversion
+        acq ; # detect 1 point
+  }
+}
+
+proc main {} {
+	global par
+	puts "Recoupling Time in ms? "
+	gets stdin rectime
+	set t0 [clock clicks -millisec]
+	set par(np) [expr round($rectime*0.001*$par(sw))]
+	set f [fsimpson]
+	fsave $f $par(name).txt -xreim
+	funload $f
+	puts stderr "[expr {([clock clicks -millisec]-$t0)/1000.}] sec"
+}
