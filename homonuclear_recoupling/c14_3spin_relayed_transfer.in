@@ -1,0 +1,107 @@
+## The simulation file is checked against the simulations
+## done in Fig 11 of paper Brinkmann, Andreas, M Edén, and M H Levitt. 
+## ‘Synchronous Helical Pulse Sequences in Magic-Angle Spinning Nuclear Magnetic Resonance: 
+## Double Quantum Recoupling of Multiple-Spin Systems’. 
+## The Journal of Chemical Physics 112, no. 19 (2000): 8539–54.
+## The spin system is Ca, Cb, and CO of L-alanine
+## Recreating the panel (a) - (c) of Fig 11
+## No damping applied because I am not trying to fit the experimental data
+## please multiply the output with exp decay if needed.
+## Please note that in the figure of the publication, the y scale is intensity and not DQ efficiency.
+## But the trend remains the same.
+
+
+## Ths spin system parameters are taken from: 
+## Levitt and Edén, ‘Numerical Simulation of Periodic Nuclear Magnetic Resonance Problems’.
+## Mol Phys 95, (1998), 879
+spinsys {
+    channels 13C
+    nuclei 13C 13C 13C
+    dipole 1 2 -2139.35 144.7 78.4 0
+    dipole 1 3 -2117.26 -154 21.5 0
+    dipole 2 3 -495.85 160 46 0
+    shift 1 -30p 13p 1.0 10 30 60
+    shift 2 -63p 5p 0.32 40 50 60
+    shift 3 95p 105p 0.78 50 60 80
+    jcoupling 1 2 35 0 0 0 0 0
+    jcoupling 1 3 55 0 0 0 0 0
+}
+
+par {
+	proton_frequency 200e6
+	spin_rate        11000
+	crystal_file     rep100
+    gamma_angles     16
+    start_operator   I1z
+    detect_operator  -I1z -I2z -I3z
+    verbose          00000010
+    method           block_diag cheby2
+	conjugate_fid 	 false
+    variable v       -5
+    variable NN      14
+    variable nn      4
+    variable tr      1e6/spin_rate
+    variable tc      nn*tr/NN
+    variable rf      1e6/tc
+    variable tau_ex  441.5
+    variable tau_rec 5000
+    variable n_ex    round(tau_ex/(nn*tr))
+    variable n_rec   round(tau_rec/(tr)/tc)
+    np               round(tau_rec/tc)
+    sw               1e6/(tc)
+}
+
+proc pulseq {} {
+    global par
+
+    maxdt 3.0
+
+    matrix set 200 elements {{1 7} {2 8} {8 2} {7 1}} ; # For filtering DQ coherence and keeping on DQ 1-2
+    ### This can be figured out taking inner porduct of Pauli matrices
+    ### The product operator should correspond to I1pI2pE + I1mI2mE
+    # matrix set 2 totalcoherence {2 -2} ; # For filtering DQ coherence
+
+    ### This block will generate propagators related to each C-element
+    for {set i 1} {$i <= 14} {incr i} {
+        reset [expr ($i-1) * $par(tc)]
+        set phase [expr $i*360.0*$par(v)/$par(NN)]
+        pulse $par(tc) $par(rf) $phase
+        store $i
+    }
+    reset ; # resets the density matrix to \rho0
+
+    # The excitation time is rounded to the nearest integer of n times the rotor period (n_ex).
+    # So the number of C elements needed for the excitation block will be N * n_ex
+
+    for {set k 1} {$k <= [expr $par(n_ex) * $par(NN)]} {incr k} {
+        prop [expr ($k-1) % $par(NN)+ 1]
+    }
+    store 100 ; # store the excitation propagator
+    reset ; # resets the density matrix to \rho0
+
+    prop 100 ; # call the excitation block
+    filter 200 ; # filter the DQ between 1 and 2
+    acq ; # acquire the 0 point
+    for {set i 1} {$i < $par(np)} {incr i} {
+        prop [expr ($i-1) % $par(NN) + 1]
+        acq ; # acquire the rest of the points
+    }
+}
+
+proc main {} {
+	global par
+    set fp [open $par(name)-DQeff_CaCbCO.txt w+] ; #create a file for writing the data
+	puts $fp "tmix(ms) dqeff1 dqeff2 dqeff3" ; # the header block
+	set t0 [clock clicks -millisec]
+	set f [fsimpson] ; # Do the simulation
+    puts "Total excitation time after rounding: [expr $par(n_ex)*$par(nn)*$par(tr)] microseconds"
+    # Write the data in the file by shuffling
+    for {set pt 1} {$pt <= $par(np)} {incr pt} {
+        set re1 [findex $f $pt -re]
+        set re2 [findex $f [expr $par(np)+$pt] -re]
+        set re3 [findex $f [expr 2*$par(np)+$pt] -re] 
+        puts $fp "[format "%.2f" [expr 1e3*($pt-1)/$par(sw)]] [format "%.2f" $re1] [format "%.2f" $re2] [format "%.2f" $re3]"
+	}
+	funload $f
+	puts stderr "Total time taken: [expr {([clock clicks -millisec]-$t0)/1000.}] sec" ; #calculate the time taken and print it.
+}
