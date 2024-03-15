@@ -1,0 +1,46 @@
+# Cross-Polarization experiment from a proton
+
+
+spinsys {
+    channels 43Ca 1H
+    nuclei 43Ca 1H
+    dipole 1 2 400 10 20 30
+    quadrupole 1 2 2.6e6 0.4 60 90 80
+}
+
+
+source ../util.tcl
+
+par {
+  proton_frequency  400e6
+  method          	gcompute freq 
+  variable lb       100
+  gamma_angles    	32
+  spin_rate       	8000
+  crystal_file    	../ASGh8193
+  start_operator  	I1x
+  detect_operator   I1p
+  np              	8192*4
+  sw              	10000
+  variable tsw    	1.0e6/spin_rate/gamma_angles
+  verbose         	1101
+}
+
+proc pulseq {} {
+  global par
+  
+  acq_block { 
+       delay $par(tsw)
+  }
+}
+
+proc main {} {
+  global par
+# result is a spectrum directly  
+  set f [fsimpson]
+  puts "Calc. time = [expr $par(tcalc)*1e-6] s"
+
+  Faddlb $f $par(lb) 0
+  fsave $f $par(name).txt -xreim
+  funload $f
+}
