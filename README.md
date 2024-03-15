@@ -60,6 +60,12 @@ In this example, it will just do tppm instead of all the sequences.
 ### Quadrupolar NMR
 The mq_excitation.in helps you to simulate how much MQ efficiency you can get as a function of pulse length. One can change parameters like RF power, spinning frequency, $C_q$ and see how much the efficiency changes.
 
+Quadrupolar excitation and detection of central transition can be done in the frequency space using quadmas.in
+
+Low power central transition selective cross-polarisation 
+can be performed using quadcpmas_detect.in
+
+One can compare between the direct excitation and the CP spectrum if needed.
 
 ### Third Spin Assisted Recoupling
 The files par_grid.in and pain_grid.in simulates third spin assisted recoupling maps as reported in the papers:
