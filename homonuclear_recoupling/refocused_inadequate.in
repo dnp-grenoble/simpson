@@ -1,0 +1,61 @@
+spinsys {
+  channels 13C
+  nuclei 13C 13C
+  shift 1   -60p 0p   0 0 0 0
+  shift 2   60p 0p  0 0 0 0
+  jcoupling 1 2 -55 0 0 0 0 0
+}
+
+par {
+  proton_frequency 400e6
+  spin_rate       6500
+  sw              spin_rate/4
+  np              128
+  crystal_file    rep233
+  gamma_angles    832
+  start_operator  I1z
+  detect_operator I2p
+  verbose         1101
+}
+
+proc pulseq {} {
+  global par
+
+  maxdt 4.0
+  matrix set 2 elements {{1 4} {4 1}}
+  matrix set 3 totalcoherence {0}
+  set tr   [expr 1.0e6/$par(spin_rate)]
+  set rf   50000
+  set t90 [expr 0.25e6/$rf]
+  set t180 [expr 0.5e6/$rf]
+  
+  set delay1 [expr $tr-$t90]
+  set delay2 [expr $tr-$t180]
+  
+  reset
+  acq
+  for {set i 1} {$i < $par(np)} {incr i} {
+    reset
+    pulse $t90 $rf y
+    delay [expr $i*$tr-$t180]
+    pulse $t180 $rf y
+    delay [expr $i*$tr-$t180]
+    pulse $t90 $rf y
+    store 1
+    filter 2
+    prop 1
+    filter 3
+    pulse $t90 $rf -y
+    acq 
+  } 
+
+
+  
+}
+
+proc main {} {
+  global par
+  set f [fsimpson]
+  # faddlb $f 40 0
+  fsave $f $par(name).txt -xreim
+}

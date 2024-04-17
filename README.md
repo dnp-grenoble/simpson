@@ -31,6 +31,12 @@ The file brS3_CC.in simulates the DQ buildup in the same spin system but with br
 The file c14_3spin_relayed_transfer.in simulates how much leakage or transfer you can get when you have a third spin involved.
 For this the file simulates the polarisation transfer profile as reported in the publication Brinkmann, Andreas, M Edén, and M H Levitt. ‘Synchronous Helical Pulse Sequences in Magic-Angle Spinning Nuclear Magnetic Resonance: Double Quantum Recoupling of Multiple-Spin Systems’. The Journal of Chemical Physics 112, no. 19 (2000): 8539–54. 
 
+The file *refocused_inadequate.in* helps to simulate the transfer efficiency for the sequence given in the papers:
+1. Nakai, T., and C. A. Mcdowell. *J. Magn. Reson.* 104 (1993) 146
+2. Cadars et al. *J. Phys. Chem. B.* 110 (2006) 16982." \
+
+It does not include relaxation, but it can be added as Lorentzian broadening or during plotting.
+
 ### RESPDOR
 
 There are two variants of RESPDOR in the repository.
