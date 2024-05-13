@@ -1,0 +1,97 @@
+spinsys {
+  channels 1H
+  nuclei 1H 1H 1H
+  dipole 1 2 -21339.63 -95.06 56.44 97.02
+  dipole 1 3 -8360.57 -13.94 48.21 47.32
+  dipole 2 3 -8939.13 2.45 52.36 -24.46
+  shift 1 -2.5p 0p 0 0 0 0
+  shift 2 -1.5p 0p 0.8 15 45 80
+  shift 3 3p 0p 1 10 40 50
+}
+
+par {
+  proton_frequency 400e6
+  spin_rate        10000
+  crystal_file     rep168
+  gamma_angles     32
+  method           direct
+  start_operator   Inx
+  detect_operator  Inp
+  verbose          01000010
+  variable swp     10
+  sw               swp*proton_frequency/1e6
+  variable tsw     1e3/sw
+  variable aq      100
+  np               round(aq/tsw)
+}
+
+proc generate_wpmlgp {N rfk sup} {
+    global par
+    set rf [expr $rfk*1000]
+    set lgoffset [expr $rf/sqrt(2.0)] ;# calculation of the LG offset
+    set taulg [expr 1.0/sqrt(pow($rf,2)+pow($lgoffset,2))] ;# calculation of the total length of the LG pulse
+    set wpmlgph [expr $taulg*$lgoffset*360/$N] ;# calculates the phase of the first pulse of wPMLG
+    set phshift [expr $wpmlgph/2] ;# this is a half phase increment/decrement shift in the first pulse of PMLG
+    set taupmlg [expr $taulg*1.0e6/$N] ;# calculates the length of each pulse of pmlg
+    set window 4.6
+    set phpmlg [expr $wpmlgph - $phshift]
+    
+    for {set i 1} {$i <= $N} {incr i} {
+        pulse $taupmlg $rf [expr fmod($phpmlg + $sup, 360)]
+        # puts "pulse $taupmlg $rf [expr fmod($phpmlg + $sup, 360)]"
+        set phpmlg [expr {$phpmlg + $wpmlgph}] 
+    }
+    set phpmlg [expr {$phpmlg - $wpmlgph + 180}]
+    for {set i 1} {$i <= $N} {incr i} {
+        pulse $taupmlg $rf [expr fmod($phpmlg + $sup, 360)]
+        # puts "pulse $taupmlg $rf [expr fmod($phpmlg + $sup, 360)]"
+        set phpmlg [expr {$phpmlg - $wpmlgph}] 
+    }
+    delay $window
+}
+
+proc generate_wpmlgm {N rfk sup} {
+    global par
+    set rf [expr $rfk*1000]
+    set lgoffset [expr $rf/sqrt(2.0)] ;# calculation of the LG offset
+    set taulg [expr 1.0/sqrt(pow($rf,2)+pow($lgoffset,2))] ;# calculation of the total length of the LG pulse
+    set wpmlgph [expr $taulg*$lgoffset*360/$N] ;# calculates the phase of the first pulse of wPMLG
+    set phshift [expr $wpmlgph/2] ;# this is a half phase increment/decrement shift in the first pulse of PMLG
+    set taupmlg [expr $taulg*1.0e6/$N] ;# calculates the length of each pulse of pmlg
+    set window 4.6
+    set phpmlg [expr 180.0 - $phshift]
+    
+    for {set i 1} {$i <= $N} {incr i} {
+        pulse $taupmlg $rf [expr fmod($phpmlg + $sup, 360)]
+        # puts "pulse $taupmlg $rf [expr fmod($phpmlg + $sup, 360)]"
+        set phpmlg [expr {$phpmlg - $wpmlgph}] 
+    }
+    set phpmlg [expr {$phpmlg + $wpmlgph + 180}]
+    for {set i 1} {$i <= $N} {incr i} {
+        pulse $taupmlg $rf [expr fmod($phpmlg + $sup, 360)]
+        # puts "pulse $taupmlg $rf [expr fmod($phpmlg + $sup, 360)]"
+        set phpmlg [expr {$phpmlg + $wpmlgph}] 
+    }
+    delay $window
+}
+
+proc pulseq {} {
+   global par
+   
+   for {set i 1} {$i <= $par(np)/2} {incr i} {
+    acq
+    generate_wpmlgm 5 100 0
+    acq
+    generate_wpmlgm 5 100 180
+   }
+}
+
+proc main {} {
+    global par
+    set f [fsimpson]
+    faddlb $f 10 1
+    fzerofill $f 16384
+    fft $f
+    fsave $f $par(name).txt -xreim
+
+}
