@@ -89,3 +89,10 @@ The file pspar_grid.in :scroll: simulates a modified version of PAR to make it b
 
 The file cpmas.in :scroll: simulates the polarisation buildup for a CH2-CO kind of system.
 The RF pulses employed here are square pulses.
+
+
+### Homonuclear Decoupling
+
+The file wpmlg.in 📜can be used to simulate windowed PMLG sequence decoupling. The two decoupling sequences demonstrated here are wPMLGmmbar and wPMLGppbar. More details about these sequences can be found in the paper:
+- Leskes, Michal, et al. ‘Proton Line Narrowing in Solid-State Nuclear Magnetic Resonance: New Insights from Windowed Phase-Modulated Lee-Goldburg Sequence.’ JCP 125 (2006) 124506. https://doi.org/10.1063/1.2352737.
+- Leskes, Michal et al. ‘Supercycled Homonuclear Dipolar Decoupling in Solid-State NMR: Toward Cleaner H1 Spectrum and Higher Spinning Rates’. JCP 128(2008) 052309. https://doi.org/10.1063/1.2834730.
