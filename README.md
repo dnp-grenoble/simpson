@@ -4,10 +4,17 @@
 The link to the github repo is:
 [SIMPSON](https://github.com/dnp-grenoble/simpson)
 
-The simulation files are mainly guides. Modify them as you feel like and if there are some errors, please let me know. I am not responsible if there do not work as intended. Please follow courses in the SIMPSON website.
+The simulation files are mainly guides. Modify them as you feel like and if there are some errors, please let me know. Please note that I am not responsible if they do not work as intended. Please follow courses or tutorials posted on the SIMPSON website.
 
 
 [INANO website](https://inano.au.dk/about/research-centers-and-projects/nmr/software/simpson)
+
+Four publications that may be helpful are:
+1. Bak, Mads, Jimmy T. Rasmussen, and Niels Chr Nielsen. ‘SIMPSON: A General Simulation Program for Solid-State NMR Spectroscopy’. Journal of Magnetic Resonance 147, no. 2 (December 2000): 296–330. https://doi.org/10.1006/jmre.2000.2179.
+2. Juhl, Dennis W., Zdeněk Tošner, and Thomas Vosegaard. ‘Versatile NMR Simulations Using SIMPSON’. In Annual Reports on NMR Spectroscopy, 100:1–59. Elsevier, 2020. https://doi.org/10.1016/bs.arnmr.2019.12.001.
+3. Tošner, Zdeněk, Rasmus Andersen, Baltzar Stevensson, Mattias Edén, Niels Chr Nielsen, and Thomas Vosegaard. ‘Computer-Intensive Simulation of Solid-State NMR Experiments Using SIMPSON’. Journal of Magnetic Resonance 246 (September 2014): 79–93. https://doi.org/10.1016/j.jmr.2014.07.002.
+4. Vosegaard, Thomas, Anders Malmendal, and Niels C Nielsen. ‘The Flexibility of SIMPSON and SIMMOL for Numerical Simulations in Solid-and Liquid-State NMR Spectroscopy’. Monatshefte f?R Chemie / Chemical Monthly 133, no. 12 (1 December 2002): 1555–74. https://doi.org/10.1007/s00706-002-0519-2.
+
 
 More simulation files will be added in due course.
 
