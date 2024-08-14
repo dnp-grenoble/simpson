@@ -1,0 +1,73 @@
+# Subsampled LG4 with windowed detection.
+# 3 spin system glycine like system.
+# The spectrum needs to be scaled with the scaling factor to get the right chemical shift
+# The value of psi needs to be kept away from 1, 2, 3 ...
+
+
+spinsys {
+  channels 1H
+  nuclei 1H 1H 1H
+  dipole 1 2 -21339.63 -95.06 56.44 97.02
+  dipole 1 3 -8360.57 -13.94 48.21 47.32
+  dipole 2 3 -8939.13 2.45 52.36 -24.46
+  shift 1 3.2p 0p 0 0 0 0
+  shift 2 3.7p 0p 0.8 15 45 80
+  shift 3 8.3p 0p 1 10 40 50
+}
+
+par {
+  proton_frequency 400e6
+  spin_rate        10000
+  crystal_file     zcw33
+  gamma_angles     32
+  method           direct
+  start_operator   Inx
+  detect_operator  Inp
+  verbose          01000000
+  variable rfk     100
+  variable rf      rfk*1000
+  variable lgoff   rf/sqrt(2.0) 
+  variable taulg   1.0e6/sqrt(pow(rf,2)+pow(lgoff,2))
+  variable window  3.8
+  variable aq      50
+  variable N       2
+  variable dwell   2*taulg + 1*window
+  variable taur    1e6/spin_rate
+  sw               1e6/dwell
+  variable tsw     1e3/sw
+  variable phsft   55
+  np               N*round(aq/(tsw))
+}
+
+
+proc pulseq {} {
+   global par
+    set loopcounter [expr $par(np)/($par(N)*2)]
+    
+    for {set i 1} {$i <= $loopcounter} {incr i} {
+        offset [expr $par(lgoff)]
+        pulse $par(taulg) $par(rf) [expr $par(phsft)]
+        offset [expr -1*$par(lgoff)]
+        pulse $par(taulg) $par(rf) [expr 180 + $par(phsft)]
+        offset 0
+        delay $par(window)
+        acq
+        offset [expr $par(lgoff)]
+        pulse $par(taulg) $par(rf) [expr 180 - $par(phsft)]
+        offset [expr -1*$par(lgoff)]
+        pulse $par(taulg) $par(rf) [expr 360 - $par(phsft)]
+        offset 0
+        delay $par(window)
+        acq 
+    }
+}
+
+proc main {} {
+    global par
+    puts "psi = [expr $par(taur)/(2*$par(dwell))]"
+    set f [fsimpson]
+    faddlb $f 50 1
+    fzerofill $f 16384
+    fft $f
+    fsave $f $par(name)-lg[expr 2*$par(N)].txt -xreim
+}

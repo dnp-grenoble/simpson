@@ -104,7 +104,13 @@ The file wpmlg.in 📜can be used to simulate windowed PMLG sequence decoupling.
 - Leskes, Michal, et al. ‘Proton Line Narrowing in Solid-State Nuclear Magnetic Resonance: New Insights from Windowed Phase-Modulated Lee-Goldburg Sequence.’ JCP 125 (2006) 124506. https://doi.org/10.1063/1.2352737.
 - Leskes, Michal et al. ‘Supercycled Homonuclear Dipolar Decoupling in Solid-State NMR: Toward Cleaner H1 Spectrum and Higher Spinning Rates’. JCP 128(2008) 052309. https://doi.org/10.1063/1.2834730.
 
+The file wlg4.in can be used to simulate subsampled LG4 kind of decoupling. The scaling factor with an added phase of 55 degrees is similar to that of wPMLG.
+More details about this sequence can be found in the paper: 
+- Halse, Meghan E., et al. ‘High-Resolution 1H Solid-State NMR Spectroscopy Using Windowed LG4 Homonuclear Dipolar Decoupling’. Israel Journal of Chemistry 54, no. 1–2 (2014): 136–46. https://doi.org/10.1002/ijch.201300101.
+
+
 The file wLG-N.in 📜 can be used to simulate FSLG or LG4 kind of decoupling. FSLG can be implemented using N = 1; LG4 can be implemented setting N = 2, LG6 as N = 3, and so on.
 More about supercycled FS/PM - LG sequences can be found in the following literatures:
 - Halse, Meghan E., et al. ‘High-Resolution 1H Solid-State NMR Spectroscopy Using Windowed LG4 Homonuclear Dipolar Decoupling’. Israel Journal of Chemistry 54, no. 1–2 (2014): 136–46. https://doi.org/10.1002/ijch.201300101.
 - Paul, S., et al. ‘Supercycled Homonuclear Dipolar Decoupling Sequences in Solid-State NMR’. Journal of Magnetic Resonance 197, no. 1 (2009): 14–19. https://doi.org/10.1016/j.jmr.2008.11.011.
+
