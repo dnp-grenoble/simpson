@@ -21,7 +21,7 @@ par {
   start_operator  	I2x
   detect_operator   I1c
   np              	8192*4
-  sw              	10000
+  sw              	spin_rate*gamma_angles
   variable tsw    	1.0e6/spin_rate/gamma_angles
   verbose         	1101
 }
