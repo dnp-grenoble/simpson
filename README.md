@@ -55,9 +55,9 @@ There are two variants of RESPDOR in the repository.
 
 There are two variants of TEDOR here, the first one is conventional tedor as simulated in the file tedor.in :scroll:. The zftedor :scroll: is a variant of out-and-back TEDOR as proposed in the following paper by Christopher Jaroniec:
 
-
 Jaroniec, C. P.; Filip, C.; Griffin, R. G. 3D TEDOR NMR Experiments for the Simultaneous Measurement of Multiple Carbon−Nitrogen Distances in Uniformly 13 C, 15 N-Labeled Solids. Journal of the American Chemical Society 2002, 124 (36), 10728–10742. https://doi.org/10.1021/ja026385y.
 
+Added a file zftedor_filter.in :scroll:, where the phase cycling of the zftedor.in :scroll: has been removed. 
 
 ### Heteronuclear Decoupling   
 The hetdec.in :scroll: file contains the option to simulate various heteronuclear decoupling sequences in solid-state NMR. For the spin system, I have chosen a $CH_2$ spin-system and the decoupling sequences that I have implemented are CW, rCW, TPPM, $SW_f$ - TPPM, SPINAL64, and XiX. The sequences can be improved by changing various parameters. I leave it up to the people interested in the topic. I have already done a PhD on it! So I am not going into optimisation of sequences.

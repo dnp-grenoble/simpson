@@ -1,0 +1,82 @@
+spinsys {
+  channels 13C 15N
+  nuclei 13C 15N
+  dipole  1 2 35.07 110.25 0.9 -110.44
+}
+
+par {
+  spin_rate       7400
+  np              32
+  crystal_file    rep144
+  gamma_angles    32
+  start_operator  I1x
+  detect_operator I1x
+  verbose         1101
+  sw              spin_rate/4
+}
+
+proc pulseq {} {
+  global par
+
+  maxdt 1.0
+  matrix set 10 elements {{1 3} {2 4} {3 1} {4 2}}  ; # For filtering IySz terms
+
+
+  set rfC  150000
+  set rfP  150000
+  set tr    [expr 1.0e6/$par(spin_rate)]
+  set t90C  [expr 0.25e6/$rfC]
+  set t180C [expr 2.0*$t90C]
+  set t90P  [expr 0.25e6/$rfP]
+  set t180P [expr 2.0*$t90P]
+
+ 
+  reset
+  delay [expr $tr/2.0-$t180P]
+  pulse $t180P 0 x $rfP x    
+  delay [expr $tr/2.0-$t180P]
+  pulse $t180P 0 x $rfP y
+  store 1
+
+  reset
+  delay [expr 1*$tr-$t180C/2]
+  pulse $t180C $rfC x 0 x
+  delay [expr 1*$tr-$t180C/2]
+  store 2
+  reset
+  
+  reset
+  pulse $t180P 0 x $rfP x  
+  delay [expr $tr/2.0-$t180P]
+  pulse $t180P 0 x $rfP y  
+  delay [expr $tr/2.0-$t180P]
+  store 3
+
+
+  for {set s 0} {$s < $par(np)} {incr s} {
+  reset
+
+  prop 1 $s
+  prop 2
+  prop 3 $s
+
+ 
+  pulseid 1 250000 x 250000 -x
+  pulseid 1 250000 x 250000 x
+  filter 10
+
+ 
+  prop 1 $s
+  prop 2
+  prop 3 $s
+ 
+  acq
+  }
+}
+
+proc main {} {
+  global par
+    set g [fsimpson]
+    fexpr $g {1-$re} {0*$im}
+    fsave $g $par(name).txt -xreim
+}
