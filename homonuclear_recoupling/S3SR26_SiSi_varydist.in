@@ -1,0 +1,126 @@
+spinsys {
+    channels 29Si
+    nuclei 29Si 29Si
+    dipole 1 2 0 150.71 7.08 -149.05
+    shift 1 -60p 0 0 0 0 0
+    shift 2 60p 0 0 0 0 0
+}	
+
+par {
+	proton_frequency 400e6
+	crystal_file     rep100
+    gamma_angles     16
+    start_operator   I1z
+    detect_operator  -I2z
+    verbose          00000000
+	conjugate_fid 	 false
+    np               32
+    num_cores        4
+    method           block_diag cheby2
+}
+
+proc recoupling {type} {
+    global par
+
+    # Write the pulse sequences
+    switch $type {
+    s3 {
+        set rf [expr 0.5*$par(spin_rate)]
+        set t90 [expr 0.25e6/$rf]
+        set t270 [expr 0.75e6/$rf]
+        set t360 [expr 1e6/$rf]
+        set ph 90
+        for {set i 1} {$i <= 2} {incr i} {
+            pulse $t360 $rf [expr $ph+fmod($i,2)*180]
+            pulse $t270 $rf [expr $ph+fmod($i,2)*180+180]
+            pulse $t90  $rf [expr $ph+fmod($i,2)*180]
+        }
+        for {set i 1} {$i <= 2} {incr i} {
+            pulse $t360 $rf [expr $ph+fmod($i,2)*180+180]
+            pulse $t270 $rf [expr $ph+fmod($i,2)*180]
+            pulse $t90  $rf [expr $ph+fmod($i,2)*180+180]
+        }
+        }
+    sr26 {
+        set rf [expr 6.5*$par(spin_rate)]
+        set t90 [expr 0.25e6/$rf]
+        set t270 [expr 0.75e6/$rf]
+        set ph [expr 180*11/26]
+        for {set k 1} {$k <=2} {incr k} {
+            for {set j 1} {$j <=2} {incr j} {
+                for {set i 1} {$i <= 13} {incr i} {
+                    pulse $t90  $rf [expr pow(-1,$k-1)*pow(-1,$j-1)*$ph+fmod($k+1,2)*180]
+                    pulse $t270 $rf [expr pow(-1,$k-1)*pow(-1,$j-1)*$ph+fmod($k,2)*180]
+                    pulse $t90  $rf [expr -pow(-1,$k-1)*pow(-1,$j-1)*$ph+fmod($k+1,2)*180]
+                    pulse $t270 $rf [expr -pow(-1,$k-1)*pow(-1,$j-1)*$ph+fmod($k,2)*180]
+                    }
+                }
+            }
+        }
+    }
+}
+
+proc pulseq {} {
+    global par
+
+    maxdt 3.0
+    matrix set 2 totalcoherence {2 -2}
+    recoupling $par(type) ; #calls the function recoupling with the seq 
+    store 1 ; #stores the propagator for 1 block of S3
+    reset ; # resets the density matrix to rho0
+    store 3 ; # identity prop
+    acq ; # take first data point i.e. zero
+    # loop below reuses stored propagators for the rest of acq
+	for {set j 1} {$j < $par(np)} {incr j} {
+        reset
+        prop 3 ; # call the identity propagator for the first time and then calls 1 to j S3's
+        prop 1 ; # call jth S3
+        store 3 ; # store it in 3
+	    filter 2 ;  # filter it for DQ
+        prop 3 ; # reconversion
+        acq ; # detect 1 point
+	}
+}
+
+proc main {} {
+    global par
+    puts "Which recoupling (sr26/s3): "
+	gets stdin seq
+    puts "MAS Freq in Hz: "
+    gets stdin wr
+    puts "Rec time in ms: "
+    gets stdin rectime
+    
+
+    set par(type) $seq ; # The type of recoupling is set here
+    set par(spin_rate) [expr $wr] ; # This spinning frequemcy is et here
+    #This function sets the dwell time required for the time axis
+
+    set par(sw) [expr $par(spin_rate)/32]
+    set tsw [expr 1e3/$par(sw)]
+    set par(np) [expr round($rectime/$tsw)]
+    puts $par(np)
+    set t0 [clock clicks -millisec]
+    set fp [open $par(name)-$seq.txt w+]
+    puts $fp "distance(A) time(ms) DQ_eff"
+    for {set i 29} {$i <= 55} {incr i 2} {
+        set dist [expr $i*0.1] 
+        set gyr1 -8.46545e6
+        set gyr2 -8.46545e6
+        set Planck 6.62607015e-34
+        set dip_coup [expr -1e-7*($gyr1 * $gyr2 * $Planck)/(($dist * 1e-10) ** 3)]
+        puts $dip_coup
+        ; # This sets the dipolar coupling according to the distance
+        set f [fsimpson [\list \
+        [list dipole_1_2_aniso $dip_coup]
+        ]] 
+        for {set k 1} {$k <= $par(np)} {incr k} {
+            set time_pt [expr (($k-1)*1e3)/$par(sw)]
+            set re [findex $f $k -re]
+            puts $fp "[format "%.2f" $dist] [format "%.2f" $time_pt] [format "%.2f" $re]"
+        }
+        funload $f
+    }
+    close $fp
+    puts stderr "[expr {([clock clicks -millisec]-$t0)/1000.}] sec"
+}
