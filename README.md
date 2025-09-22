@@ -44,6 +44,8 @@ The file *refocused_inadequate.in* :scroll: helps to simulate the transfer effic
 
 It does not include relaxation, but it can be added as Lorentzian broadening or during plotting.
 
+The file S3SR26_SiSi_varydist.in :scroll: helps you to do a grid simulation where in one dimension you have distance and in the other axis you have the recoupling time. The resulting contour gives you the polarisation transfer efficiency.
+
 ### RESPDOR
 
 There are two variants of RESPDOR in the repository.
