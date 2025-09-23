@@ -46,20 +46,34 @@ It does not include relaxation, but it can be added as Lorentzian broadening or 
 
 The file S3SR26_SiSi_varydist.in :scroll: helps you to do a grid simulation where in one dimension you have distance and in the other axis you have the recoupling time. The resulting contour gives you the polarisation transfer efficiency.
 
-### RESPDOR
+
+### Heteronuclear Recoupling
+
+## RESPDOR
 
 There are two variants of RESPDOR in the repository.
 1. [R-RESPDOR](https://doi.org/10.1039/B611447D.
 ): Gan, Z.  Chem. Commun. 2006, No. 45, 4712–4714. 
 2. [S-RESPDOR](https://doi.org/10.1016/j.jmr.2011.12.009.): Lu, X.; Lafon, O.; Trébosc, J.; Amoureux, J.-P. J. Mag. Reson. 2012, 215, 34–49. 
 
-### TEDOR
+## TEDOR
 
 There are two variants of TEDOR here, the first one is conventional tedor as simulated in the file tedor.in :scroll:. The zftedor :scroll: is a variant of out-and-back TEDOR as proposed in the following paper by Christopher Jaroniec:
 
 Jaroniec, C. P.; Filip, C.; Griffin, R. G. 3D TEDOR NMR Experiments for the Simultaneous Measurement of Multiple Carbon−Nitrogen Distances in Uniformly 13 C, 15 N-Labeled Solids. Journal of the American Chemical Society 2002, 124 (36), 10728–10742. https://doi.org/10.1021/ja026385y.
 
 Added a file zftedor_filter.in :scroll:, where the phase cycling of the zftedor.in :scroll: has been removed. 
+
+## DIPSHIFT
+
+DIPSHIFT is a variant of REDOR where you can do a constant time experiment where you monitor the dephasing and rephasing within one rotor period. The script dipshift.in 📜 is based on the following paper:
+
+Jain, Mukul G., G. Rajalakshmi, Vipin Agarwal, P. K. Madhu, and Kaustubh R. Mote. “On the Direct Relation between REDOR and DIPSHIFT Experiments in Solid-State NMR.” Journal of Magnetic Resonance 308 (November 2019): 106563. https://doi.org/10.1016/j.jmr.2019.07.050.
+
+The program uses ideal pulses as otherwise maintaining one rotor period becomes a bit more tricky in SIMPSON. The ideal pulse version will be implemented in the future.
+
+
+
 
 ### Heteronuclear Decoupling   
 The hetdec.in :scroll: file contains the option to simulate various heteronuclear decoupling sequences in solid-state NMR. For the spin system, I have chosen a $CH_2$ spin-system and the decoupling sequences that I have implemented are CW, rCW, TPPM, $SW_f$ - TPPM, SPINAL64, and XiX. The sequences can be improved by changing various parameters. I leave it up to the people interested in the topic. I have already done a PhD on it! So I am not going into optimisation of sequences.
