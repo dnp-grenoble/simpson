@@ -1,0 +1,90 @@
+spinsys {
+  channels 1H 13C 
+  nuclei   1H 13C
+  dipole 1 2	-10000	90.63	34.54	-95.07
+  
+}
+
+par {
+  spin_rate        6000
+  proton_frequency 400e6
+  start_operator   I2x
+  detect_operator  I2p
+  crystal_file     zcw33
+  gamma_angles     8
+  verbose          1101
+  np               512
+  variable rf      100e3
+  variable t180    0.5e6/rf
+  
+  variable tau_r    1e6/spin_rate
+  variable tau_r_half   tau_r/2
+  variable tau_r_quarter tau_r/4
+  variable time_shift tau_r_half/(np-1)
+  sw spin_rate
+  method           block_diag dsyev
+ 
+  variable N_rec 1  
+
+}
+proc pulseq {} {
+   global par
+
+
+
+
+
+
+   reset
+
+   for {set i 1} {$i <= $par(np)} {incr i} {
+        reset
+
+        delay [expr ($i-1)*$par(time_shift) + $par(tau_r_quarter)]
+        
+        for {set j 1} {$j <= $par(N_rec)} {incr j} {
+            delay [expr $par(tau_r_quarter) - $par(t180)/2]
+            pulse $par(t180) $par(rf) x 0 x
+            delay [expr $par(tau_r_quarter) - $par(t180)/2]
+            delay [expr $par(tau_r_quarter) - $par(t180)/2]
+            pulse $par(t180) $par(rf) y 0 x
+            delay [expr $par(tau_r_quarter) - $par(t180)/2]
+            
+        }
+        delay [expr $par(tau_r_half) - ($i-1)*$par(time_shift) + $par(tau_r_quarter)]
+        
+
+
+    delay [expr $par(tau_r) - $par(t180)/2]
+    pulse $par(t180) $par(rf) x $par(rf) y
+    delay [expr $par(tau_r) - $par(t180)/2]
+    
+    
+    
+    delay [expr $par(tau_r_half) - ($i-1)*$par(time_shift) + $par(tau_r_quarter)]
+        for {set j 1} {$j <=$par(N_rec)} {incr j} {
+            delay [expr $par(tau_r_quarter) - $par(t180)/2]
+            pulse $par(t180) $par(rf) x 0 x
+            delay [expr $par(tau_r_quarter) - $par(t180)/2]
+            delay [expr $par(tau_r_quarter) - $par(t180)/2]
+            pulse $par(t180) $par(rf) y 0 x
+            delay [expr $par(tau_r_quarter) - $par(t180)/2]
+            
+        }
+         delay [expr ($i-1)*$par(time_shift) + $par(tau_r_quarter)]
+    
+    acq
+    }
+}
+
+
+proc main {} {
+  global par
+    puts "Total Recoupling Time in ms? [expr $par(N_rec)*$par(tau_r_half)/1000]"
+
+	set f [fsimpson]
+	fsave $f $par(name).fid
+    fsave $f $par(name).txt -xreim
+	funload $f
+ 
+}

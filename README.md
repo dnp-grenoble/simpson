@@ -70,9 +70,7 @@ DIPSHIFT is a variant of REDOR where you can do a constant time experiment where
 
 Jain, Mukul G., G. Rajalakshmi, Vipin Agarwal, P. K. Madhu, and Kaustubh R. Mote. “On the Direct Relation between REDOR and DIPSHIFT Experiments in Solid-State NMR.” Journal of Magnetic Resonance 308 (November 2019): 106563. https://doi.org/10.1016/j.jmr.2019.07.050.
 
-The program uses ideal pulses as otherwise maintaining one rotor period becomes a bit more tricky in SIMPSON. The ideal pulse version will be implemented in the future.
-
-
+The script dipshift_finitepulse.in 📜 with finite pulses might help to set up experiments such that the DIPSHIFT curve remains symmetric.
 
 
 ### Heteronuclear Decoupling   
