@@ -13,7 +13,7 @@ par {
   crystal_file     zcw33
   gamma_angles     8
   verbose          1101
-  np               512
+  np               32
   variable rf      100e3
   variable t180    0.5e6/rf
   

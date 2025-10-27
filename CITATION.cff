@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use codes from this repository, please cite it as below."
+authors:
+- family-names: "Paul"
+  given-names: "Subhradip"
+  orcid: "https://orcid.org/0000-0001-9414-6526"
+title: "SIMPSON Codes for NMR Simulations"
+version: 0.0.0
+doi: 10.5281/zenodo.17457240
+date-released: 2025-10-27
+url: "https://github.com/dnp-grenoble/simpson.git"
