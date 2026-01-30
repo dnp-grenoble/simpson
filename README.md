@@ -1,6 +1,10 @@
 # Simpson
 ## Numerical simulations in NMR using SIMPSON
 
+Please cite this repository if you find it useful in your research or teaching. The doi is:
+[![DOI](https://zenodo.org/badge/475826355.svg)](https://doi.org/10.5281/zenodo.17457239)
+
+
 The link to the github repo is:
 [SIMPSON](https://github.com/dnp-grenoble/simpson)
 
