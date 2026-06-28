@@ -115,6 +115,8 @@ The file pspar_grid.in :scroll: simulates a modified version of PAR to make it b
 The file cpmas.in :scroll: simulates the polarisation buildup for a CH2-CO kind of system.
 The RF pulses employed here are square pulses.
 
+The file rampcp.in 📜 simulates cross polarisation using a ramp.
+
 
 ### Homonuclear Decoupling
 
