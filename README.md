@@ -37,7 +37,7 @@ If you use these scripts, please cite the repository — see [Citing this reposi
 
 ## Requirements & running a simulation
 
-You need a working install of **[SIMPSON](https://inano.au.dk/about/research-centers-and-projects/nmr/software/simpson)** (the Tcl-scriptable spin-dynamics simulation package from Aarhus/Vosegaard & Nielsen). Installation instructions and binaries are on the INANO website linked above.
+You need a working install of **[SIMPSON](https://inano.au.dk/about/research-centers-and-projects/nmr/software-and-tools/simpson)** (the Tcl-scriptable spin-dynamics simulation package from Aarhus/Vosegaard & Nielsen). Installation instructions and binaries are on the INANO website linked above.
 
 Once SIMPSON is installed and on your `PATH`, run any script from its own directory, e.g.:
 
@@ -214,6 +214,8 @@ These files use `acq_block` and block diagonalisation to speed up the simulation
 2. Juhl, Dennis W., Zdeněk Tošner, and Thomas Vosegaard. "Versatile NMR Simulations Using SIMPSON." In *Annual Reports on NMR Spectroscopy*, 100:1–59. Elsevier, 2020. https://doi.org/10.1016/bs.arnmr.2019.12.001.
 3. Tošner, Zdeněk, Rasmus Andersen, Baltzar Stevensson, Mattias Edén, Niels Chr Nielsen, and Thomas Vosegaard. "Computer-Intensive Simulation of Solid-State NMR Experiments Using SIMPSON." *Journal of Magnetic Resonance* 246 (September 2014): 79–93. https://doi.org/10.1016/j.jmr.2014.07.002.
 4. Vosegaard, Thomas, Anders Malmendal, and Niels C Nielsen. "The Flexibility of SIMPSON and SIMMOL for Numerical Simulations in Solid- and Liquid-State NMR Spectroscopy." *Monatshefte für Chemie / Chemical Monthly* 133, no. 12 (1 December 2002): 1555–74. https://doi.org/10.1007/s00706-002-0519-2.
+5. Goodwin, David L., José P. Carvalho, Anders B. Nielsen, et al. “Extending Numerical Simulations in SIMPSON: Electron Paramagnetic Resonance, Dynamic Nuclear Polarisation, Propagator Splitting, Pulse Transients, and Quadrupolar Cross Terms.” Journal of Magnetic Resonance Open 27 (June 2026): 100218. https://doi.org/10.1016/j.jmro.2026.100218.
+
 
 ## Citing this repository
 
