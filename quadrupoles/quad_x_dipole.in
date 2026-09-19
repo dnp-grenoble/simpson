@@ -1,0 +1,49 @@
+spinsys {
+  channels 1H 79Br
+  nuclei 1H 79Br 79Br 79Br
+  dipole 1	2	-750 0 10 20
+  dipole 1	3	-750 120 10 20
+  dipole 1	4	-750 240 10 20
+  quadrupole 2 2 100e6 0.6 0 10 20
+  quadrupole 3 2 100e6 0.6  0 10 20
+  quadrupole 4 2 100e6 0.6 0 10 20
+  quadrupole_x_dipole 2 1
+  quadrupole_x_dipole 3 1
+  quadrupole_x_dipole 4 1
+  
+}
+
+par {
+  proton_frequency 400e6
+  spin_rate       8000
+  crystal_file    rep168
+  gamma_angles    16
+  start_operator  I1x
+  detect_operator I1p
+  verbose         1101
+  conjugate_fid   false
+  np              16384
+  sw              spin_rate * gamma_angles
+  variable tsw    1.0e6/sw
+  num_cores       8
+  method          gcompute
+
+}
+
+proc pulseq {} {
+  global par
+
+  
+  reset
+  acq_block {  delay $par(tsw)  }
+
+  
+}
+
+proc main {} {
+  global par
+  set f [fsimpson]
+  faddlb $f 100 0
+  fft $f
+  fsave $f $par(name).txt -xreim  
+}
